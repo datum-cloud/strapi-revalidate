@@ -1,0 +1,87 @@
+{
+  "name": "strapi-revalidate",
+  "version": "0.1.0",
+  "description": "Framework-agnostic runtime cache invalidation for Strapi v5 in SSR frontends. Receives Strapi publish webhooks, clears affected cache tags, next request serves fresh data.",
+  "keywords": [
+    "strapi",
+    "strapi-v5",
+    "cache",
+    "revalidate",
+    "webhook",
+    "ssr",
+    "astro",
+    "nextjs",
+    "sveltekit",
+    "nuxt"
+  ],
+  "homepage": "https://github.com/datum-cloud/strapi-revalidate#readme",
+  "bugs": {
+    "url": "https://github.com/datum-cloud/strapi-revalidate/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/datum-cloud/strapi-revalidate.git"
+  },
+  "license": "MIT",
+  "author": "datum.net",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./cache": {
+      "types": "./dist/cache/index.d.ts",
+      "import": "./dist/cache/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.js"
+    },
+    "./content": {
+      "types": "./dist/content/index.d.ts",
+      "import": "./dist/content/index.js"
+    },
+    "./webhook": {
+      "types": "./dist/webhook/handler.d.ts",
+      "import": "./dist/webhook/handler.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    ".env.example"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "zod": "^3.23.0"
+  },
+  "peerDependencies": {
+    "typescript": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
+  "optionalDependencies": {
+    "ioredis": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.6.0"
+  }
+}
