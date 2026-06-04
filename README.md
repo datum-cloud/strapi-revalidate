@@ -222,6 +222,18 @@ Every successful Strapi fetch writes to **two** caches: the primary TTL cache (c
 
 Issues and PRs welcome at [github.com/datum-cloud/strapi-revalidate](https://github.com/datum-cloud/strapi-revalidate/issues). This library was extracted from production code at [datum.net](https://datum.net); contributions that keep the public surface small and the dependencies few are especially appreciated.
 
+### Releasing
+
+This repo uses [Changesets](https://github.com/changesets/changesets) + GitHub Actions for automated releases. When your PR introduces a user-visible change, add a changeset:
+
+```bash
+npx changeset
+```
+
+Pick the bump type (`patch` / `minor` / `major`) and write a short summary. Commit the generated `.changeset/*.md` alongside your changes.
+
+After your PR merges to `main`, the **Release** workflow opens (or updates) a `chore: version packages` PR that consumes the pending changesets, bumps `package.json`, and updates `CHANGELOG.md`. Merging that PR triggers an automated `npm publish` via [npm OIDC trusted publishing](https://docs.npmjs.com/trusted-publishers) — no long-lived npm token in repo secrets, and each release ships with a verifiable provenance attestation tied back to the source commit.
+
 ## License
 
 MIT

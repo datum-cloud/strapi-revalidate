@@ -1,0 +1,69 @@
+name: Release
+
+# When commits land on main:
+#  - If they introduce new .changeset/*.md files → opens or updates a
+#    "Version Packages" PR that bumps package.json and updates CHANGELOG.md.
+#  - If the latest commit consumed pending changesets (i.e. the Version
+#    Packages PR was just merged) → runs `npm publish`.
+#
+# The same job handles both modes via `changesets/action@v1`.
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write       # commit version bumps and push the release tag
+      pull-requests: write  # open / update the Version Packages PR
+      id-token: write       # required for npm provenance attestation
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # changesets needs full history to compute the release notes diff.
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      # npm OIDC trusted publishing requires npm >= 11.5.1. Node 22's bundled
+      # npm is older than that on most runners as of 2026, so upgrade explicitly.
+      - name: Upgrade npm to latest
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Create Release PR or Publish to npm
+        uses: changesets/action@v1
+        with:
+          version: npm run version-packages
+          publish: npm run release
+          commit: 'chore: version packages'
+          title: 'chore: version packages'
+          createGithubReleases: true
+        env:
+          # No NPM_TOKEN: this workflow publishes via npm OIDC trusted publishing.
+          # The `id-token: write` permission above lets npm CLI mint a short-lived
+          # OIDC token from GitHub, exchange it with the npm registry, and publish.
+          # Configure the trusted publisher at:
+          #   https://www.npmjs.com/package/@datum-cloud/strapi-revalidate/access
+          # with: repo = datum-cloud/strapi-revalidate, workflow = release.yml.
+          # Provenance attestation is automatic with OIDC publishing.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
