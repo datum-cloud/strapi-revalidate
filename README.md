@@ -2,7 +2,7 @@
 
 Keep your SSR frontend in sync with Strapi content — automatically.
 
-[![npm version](https://img.shields.io/npm/v/strapi-revalidate.svg)](https://www.npmjs.com/package/strapi-revalidate)
+[![npm version](https://img.shields.io/npm/v/@datum-cloud/strapi-revalidate.svg)](https://www.npmjs.com/package/@datum-cloud/strapi-revalidate)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](https://nodejs.org)
 
@@ -21,7 +21,7 @@ The two approaches are complementary. If you're already running `strapi-cache` o
 ## Install
 
 ```bash
-npm install strapi-revalidate
+npm install @datum-cloud/strapi-revalidate
 ```
 
 ## Quickstart
@@ -32,7 +32,7 @@ Each snippet below is a complete, copy-pasteable example. Pick your framework.
 
 ```ts
 // src/lib/strapi.ts
-import { createStrapiRevalidate } from 'strapi-revalidate';
+import { createStrapiRevalidate } from '@datum-cloud/strapi-revalidate';
 
 export const { client, cache, webhook } = createStrapiRevalidate({
   url: import.meta.env.STRAPI_URL,
@@ -44,7 +44,7 @@ export const { client, cache, webhook } = createStrapiRevalidate({
 ```astro
 ---
 // src/pages/blog/index.astro
-import { fetchArticles } from 'strapi-revalidate/content';
+import { fetchArticles } from '@datum-cloud/strapi-revalidate/content';
 import { client, cache } from '../../lib/strapi';
 
 const articles = await fetchArticles({ client, cache });
@@ -81,7 +81,7 @@ export const POST: APIRoute = async ({ request }) => {
 
 ```ts
 // lib/strapi.ts
-import { createStrapiRevalidate } from 'strapi-revalidate';
+import { createStrapiRevalidate } from '@datum-cloud/strapi-revalidate';
 
 export const { client, cache, webhook } = createStrapiRevalidate({
   url: process.env.STRAPI_URL!,
@@ -92,7 +92,7 @@ export const { client, cache, webhook } = createStrapiRevalidate({
 
 ```tsx
 // app/blog/page.tsx
-import { fetchArticles } from 'strapi-revalidate/content';
+import { fetchArticles } from '@datum-cloud/strapi-revalidate/content';
 import { client, cache } from '@/lib/strapi';
 
 export default async function BlogPage() {
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
 
 ```ts
 // src/lib/strapi.ts
-import { createStrapiRevalidate } from 'strapi-revalidate';
+import { createStrapiRevalidate } from '@datum-cloud/strapi-revalidate';
 import { env } from '$env/dynamic/private';
 
 export const { client, cache, webhook } = createStrapiRevalidate({
@@ -145,7 +145,7 @@ export const { client, cache, webhook } = createStrapiRevalidate({
 
 ```ts
 // src/routes/blog/+page.server.ts
-import { fetchArticles } from 'strapi-revalidate/content';
+import { fetchArticles } from '@datum-cloud/strapi-revalidate/content';
 import { client, cache } from '$lib/strapi';
 
 export const load = async () => {
