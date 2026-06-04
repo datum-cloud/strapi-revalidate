@@ -31,10 +31,14 @@ const webhookConfigSchema = z
   .object({
     secret: z.string().optional(),
     tagMap: z.record(z.array(z.string())).optional(),
+    // `z.function().args(...).returns(...)` is a zod v3-only chain — v4 reshaped
+    // the function schema API and removed it. Use `z.custom` instead so the schema
+    // loads under either major version. Runtime validation still ensures the value
+    // is a function; the TS-level signature carries the typed shape.
     onRevalidate: z
-      .function()
-      .args(z.custom<WebhookEvent>())
-      .returns(z.union([z.void(), z.promise(z.void())]))
+      .custom<(event: WebhookEvent) => void | Promise<void>>(
+        (val) => typeof val === 'function'
+      )
       .optional(),
   })
   .optional();

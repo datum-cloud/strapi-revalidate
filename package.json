@@ -1,6 +1,6 @@
 {
   "name": "@datum-cloud/strapi-revalidate",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Framework-agnostic runtime cache invalidation for Strapi v5 in SSR frontends. Receives Strapi publish webhooks, clears affected cache tags, next request serves fresh data.",
   "keywords": [
     "strapi",
