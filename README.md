@@ -1,4 +1,4 @@
-# strapi-revalidate
+# @datum-cloud/strapi-revalidate
 
 Keep your SSR frontend in sync with Strapi content — automatically.
 
