@@ -16,8 +16,11 @@ export interface GraphQLResponse<T> {
 export interface GraphQLClientOptions {
   /** Strapi base URL (no trailing `/graphql`). */
   url: string;
-  /** Strapi API token. Sent as `Authorization: Bearer <token>`. */
-  token: string;
+  /**
+   * Strapi API token. Sent as `Authorization: Bearer <token>` when present.
+   * Omit for Strapi instances where the queried content is publicly readable.
+   */
+  token?: string;
   /** Per-request timeout in **milliseconds**. */
   timeout: number;
   /** Number of retries on transport failure (timeout, network, 5xx). 0 disables retry. */
@@ -90,7 +93,7 @@ export class GraphQLStrapiClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.options.token}`,
+          ...(this.options.token ? { Authorization: `Bearer ${this.options.token}` } : {}),
         },
         body: JSON.stringify({ query, variables }),
         signal: controller.signal,

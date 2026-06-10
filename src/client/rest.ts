@@ -9,7 +9,7 @@
 /** Configuration for the (not-yet-implemented) REST client. */
 export interface RestClientOptions {
   url: string;
-  token: string;
+  token?: string;
   timeout: number;
   retry: number;
 }
