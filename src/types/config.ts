@@ -51,7 +51,7 @@ const webhookConfigSchema = z
  */
 export const revalidateConfigSchema = z.object({
   url: z.string().url(),
-  token: z.string().min(1),
+  token: z.string().min(1).optional(),
   webhook: webhookConfigSchema,
   cache: cacheConfigSchema,
   transport: transportNameSchema.default('graphql'),

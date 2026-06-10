@@ -5,8 +5,8 @@
  *  - Track tag membership across writes so `invalidate(tag)` is O(tagged keys).
  *  - Mirror every successful `set()` to a persistent fallback driver with no
  *    TTL, so Strapi outages don't take the site down.
- *  - Provide `getWithFallback()` for read paths: short-TTL hit > fetch >
- *    long-lived fallback hit.
+ *  - `getWithFallback()` for resilient read paths: primary hit → fetcher →
+ *    fallback, with a single cache write on fresh data.
  *
  * Drivers themselves stay storage-only; tag accounting lives here.
  */
@@ -54,6 +54,38 @@ export class CacheManager {
   /** Read from the persistent fallback cache. Returns `null` if never populated. */
   async getFallback<T>(key: string): Promise<T | null> {
     return this.fallback.get<T>(key);
+  }
+
+  /**
+   * Full read path with outage resilience:
+   * 1. Return the primary cache value if present.
+   * 2. Call `fetcher()` to get fresh data.
+   * 3. On success, write to both primary and fallback caches, then return.
+   * 4. On failure (`null`), return whatever the fallback cache holds.
+   *
+   * @param key     Cache key.
+   * @param fetcher Async function that fetches fresh data. Return `null` to
+   *                signal failure and trigger the fallback read.
+   * @param options TTL and tag options forwarded to `set()` on a fresh write.
+   */
+  async getWithFallback<T>(
+    key: string,
+    fetcher: () => Promise<T | null>,
+    options: CacheSetOptions = {}
+  ): Promise<T | null> {
+    const cached = await this.get<T>(key);
+    if (cached !== null) return cached;
+
+    const fresh = await fetcher();
+    if (fresh !== null) {
+      await this.set(key, fresh, options);
+      return fresh;
+    }
+
+    if (this.debug) {
+      console.debug(`[strapi-revalidate] fetcher returned null, reading fallback → ${key}`);
+    }
+    return this.getFallback<T>(key);
   }
 
   /**
