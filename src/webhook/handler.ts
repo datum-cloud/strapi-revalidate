@@ -11,11 +11,12 @@
  *  1. 405 if method isn't POST.
  *  2. 401 if a secret is configured and the request's secret doesn't match
  *     (constant-time compare; supports `Authorization: Bearer <secret>`,
- *     `X-Strapi-Signature`, or a raw `strapi-webhook-secret` header).
+ *     `X-Strapi-Signature`, `strapi-webhook-secret`, or `X-Webhook-Secret`).
  *  3. 400 if the body isn't a parseable Strapi v5 webhook payload.
  *  4. Resolves tags via `mapModelToTags`, calls `cache.invalidate(tag)` for
  *     each, and invokes `onRevalidate` if configured.
- *  5. 200 with `{ ok: true, tags }`.
+ *  5. 200 with `{ ok: true, tags }`, or 502 when `onRevalidate` throws and
+ *     `webhook.failOnWarmError` is true (default).
  */
 
 import { timingSafeEqual } from 'node:crypto';
@@ -23,13 +24,9 @@ import { createCache } from '../cache/index.js';
 import type { CacheManager } from '../cache/manager.js';
 import { revalidateConfigSchema } from '../types/config.js';
 import type { RevalidateConfig, RevalidateConfigInput } from '../types/config.js';
+import { buildWebhookEvent } from './event.js';
 import { mapModelToTags } from './tags.js';
-import type {
-  WebhookEvent,
-  WebhookPayload,
-  WebhookRequest,
-  WebhookResponse,
-} from './types.js';
+import type { WebhookPayload, WebhookRequest, WebhookResponse } from './types.js';
 
 /** Async function shape returned by `createWebhookHandler`. */
 export type WebhookHandler = (req: WebhookRequest, res: WebhookResponse) => Promise<void>;
@@ -86,22 +83,25 @@ export function createWebhookHandler(
       await cache.invalidate(tag);
     }
 
-    const event: WebhookEvent = {
-      event: payload.event,
-      model: payload.model,
-      uid: payload.uid,
-      entryId: payload.entry.documentId,
-      slug: typeof payload.entry.slug === 'string' ? payload.entry.slug : undefined,
-      tags,
-    };
+    const event = buildWebhookEvent(payload, tags);
+    const failOnWarmError = config.webhook?.failOnWarmError ?? true;
 
     if (config.webhook?.onRevalidate) {
       try {
         await config.webhook.onRevalidate(event);
       } catch (err) {
-        // The cache is already invalidated; surface the hook failure to the caller
-        // but treat the revalidation itself as successful.
         console.error('[strapi-revalidate] onRevalidate hook threw:', err);
+        if (failOnWarmError) {
+          res.status(502);
+          res.json({
+            ok: false,
+            invalidated: true,
+            error: 'Cache warm failed',
+            message: err instanceof Error ? err.message : 'Unknown warm error',
+            tags,
+          });
+          return;
+        }
       }
     }
 
@@ -142,6 +142,7 @@ function readSecret(req: WebhookRequest): string | null {
   return (
     headerValue(req, 'x-strapi-signature') ??
     headerValue(req, 'strapi-webhook-secret') ??
+    headerValue(req, 'x-webhook-secret') ??
     null
   );
 }
