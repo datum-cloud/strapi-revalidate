@@ -40,6 +40,13 @@ const webhookConfigSchema = z
         (val) => typeof val === 'function'
       )
       .optional(),
+    /**
+     * When true (default), an `onRevalidate` hook failure returns HTTP 502 with
+     * `{ ok: false, invalidated: true }` so webhook callers can detect partial
+     * failure after cache invalidation. Set false to preserve the pre-0.3.0
+     * behaviour of logging the error and returning 200.
+     */
+    failOnWarmError: z.boolean().default(true),
   })
   .optional();
 

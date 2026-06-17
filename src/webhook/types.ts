@@ -23,8 +23,8 @@ export interface WebhookPayload {
   /** Strapi UID, e.g. `"api::article.article"`. */
   uid: string;
   entry: {
-    id: number;
-    documentId: string;
+    id?: number;
+    documentId?: string;
     slug?: string;
     [key: string]: unknown;
   };
