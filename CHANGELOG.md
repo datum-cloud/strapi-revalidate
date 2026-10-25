@@ -1,5 +1,11 @@
 # @datum-cloud/strapi-revalidate
 
+## 0.3.1
+
+### Patch Changes
+
+- 0ac1165: Upgrade zod to 4.6.6 to clear a high-severity advisory.
+
 ## 0.3.0
 
 ### Minor Changes
