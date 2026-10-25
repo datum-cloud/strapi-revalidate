@@ -25,12 +25,12 @@ const cacheConfigSchema = z
     redisUrl: z.string().url().optional(),
     keyPrefix: z.string().optional(),
   })
-  .default({});
+  .prefault({});
 
 const webhookConfigSchema = z
   .object({
     secret: z.string().optional(),
-    tagMap: z.record(z.array(z.string())).optional(),
+    tagMap: z.record(z.string(), z.array(z.string())).optional(),
     // `z.function().args(...).returns(...)` is a zod v3-only chain — v4 reshaped
     // the function schema API and removed it. Use `z.custom` instead so the schema
     // loads under either major version. Runtime validation still ensures the value
