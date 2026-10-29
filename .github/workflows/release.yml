@@ -53,6 +53,7 @@ jobs:
       - name: Create Release PR or Publish to npm
         uses: changesets/action@v1
         with:
+          commitMode: github-api
           version: npm run version-packages
           publish: npm run release
           commit: 'chore: version packages'
