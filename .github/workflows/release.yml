@@ -51,7 +51,7 @@ jobs:
         run: npm run build
 
       - name: Create Release PR or Publish to npm
-        uses: changesets/action@v2.1.2
+        uses: changesets/action@v1
         with:
           commitMode: github-api
           version: npm run version-packages
