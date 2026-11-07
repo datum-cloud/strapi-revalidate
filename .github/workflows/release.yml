@@ -6,7 +6,7 @@ name: Release
 #  - If the latest commit consumed pending changesets (i.e. the Version
 #    Packages PR was just merged) → runs `npm publish`.
 #
-# The same job handles both modes via `changesets/action@v1`.
+# The same job handles both modes via `changesets/action@v2`.
 
 on:
   push:
@@ -53,12 +53,11 @@ jobs:
       - name: Create Release PR or Publish to npm
         uses: changesets/action@v2.1.2
         with:
-          commitMode: github-api
-          version: npm run version-packages
-          publish: npm run release
-          commit: 'chore: version packages'
-          title: 'chore: version packages'
-          createGithubReleases: true
+          version-script: npm run version-packages
+          publish-script: npm run release
+          commit-message: 'chore: version packages'
+          pr-title: 'chore: version packages'
+          create-github-releases: true
         env:
           # No NPM_TOKEN: this workflow publishes via npm OIDC trusted publishing.
           # The `id-token: write` permission above lets npm CLI mint a short-lived
