@@ -4,7 +4,7 @@ Keep your SSR frontend in sync with Strapi content — automatically.
 
 [![npm version](https://img.shields.io/npm/v/@datum-cloud/strapi-revalidate.svg)](https://www.npmjs.com/package/@datum-cloud/strapi-revalidate)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-[![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen.svg)](https://nodejs.org)
+[![Node](https://img.shields.io/badge/node-%3E%3D24-brightgreen.svg)](https://nodejs.org)
 
 `strapi-revalidate` is a framework-agnostic Node.js library for SSR frontends using Strapi v5 as a headless CMS. It caches Strapi content locally (file, memory, or Redis), receives Strapi publish webhooks, and invalidates only the affected cache entries — so the next request always serves fresh data without a full rebuild or manual intervention. Battle-tested in production at [datum.net](https://datum.net).
 
